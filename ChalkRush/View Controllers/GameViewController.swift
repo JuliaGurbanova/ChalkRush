@@ -384,15 +384,9 @@ extension GameViewController: AVAudioPlayerDelegate {
             return
         }
 
-        if currentSound == "crash" {
-//            DispatchQueue.main.async { [weak self] in
-//                self?.endGame()
-//            }
-        } else if currentSound == "driving" {
+        if currentSound == "driving" {
             audioPlayer?.currentTime = 0
             audioPlayer?.play()
         }
-
-        self.currentSound = nil
     }
 }
