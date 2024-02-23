@@ -22,6 +22,21 @@ enum FontSizes: CGFloat {
     case scoreLabel = 30.0
 }
 
+enum ImageFrame {
+    static let size: CGFloat = 100.0
+    static let cellSize: CGFloat = 50.0
+    static let cornerRadius: CGFloat = 10.0
+    static let borderWidth: CGFloat = 2.0
+}
+
+enum Paddings {
+    static let zero: CGFloat = 0.0
+    static let xSmall: CGFloat = 4.0
+    static let small: CGFloat = 8.0
+    static let standard: CGFloat = 16.0
+    static let settingsPadding: CGFloat = 20.0
+}
+
 // Game Settings
 
 enum Cars{

@@ -60,9 +60,9 @@ class SettingsViewController: UIViewController, UINavigationControllerDelegate {
             avatarImageView.image = DataManager.loadImage(from: player.avatarImagePath)
         }
         avatarImageView.contentMode = .scaleAspectFit
-        avatarImageView.layer.cornerRadius = 10
+        avatarImageView.layer.cornerRadius = ImageFrame.cornerRadius
         avatarImageView.layer.masksToBounds = true
-        avatarImageView.layer.borderWidth = 2.0
+        avatarImageView.layer.borderWidth = ImageFrame.borderWidth
         avatarImageView.layer.borderColor = UIColor.white.cgColor
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         avatarImageView.isUserInteractionEnabled = true
@@ -105,44 +105,42 @@ class SettingsViewController: UIViewController, UINavigationControllerDelegate {
         )
 
         NSLayoutConstraint.activate([
-            avatarImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
+            avatarImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: ImageFrame.size),
             avatarImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            avatarImageView.widthAnchor.constraint(equalToConstant: 100),
-            avatarImageView.heightAnchor.constraint(equalToConstant: 100),
+            avatarImageView.widthAnchor.constraint(equalToConstant: ImageFrame.size),
+            avatarImageView.heightAnchor.constraint(equalToConstant: ImageFrame.size),
 
-            avatarPromptLabel.topAnchor.constraint(equalTo: avatarImageView.bottomAnchor, constant: 8),
-            avatarPromptLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            avatarPromptLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            avatarPromptLabel.topAnchor.constraint(equalTo: avatarImageView.bottomAnchor, constant: Paddings.small),
+            avatarPromptLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.settingsPadding),
+            avatarPromptLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Paddings.settingsPadding),
 
-            nameLabel.topAnchor.constraint(equalTo: avatarPromptLabel.bottomAnchor, constant: 20),
-            nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            nameLabel.topAnchor.constraint(equalTo: avatarPromptLabel.bottomAnchor, constant: Paddings.settingsPadding),
+            nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.settingsPadding),
 
-            nameTextField.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
-            nameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            nameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            nameTextField.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: Paddings.small),
+            nameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.settingsPadding),
+            nameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Paddings.settingsPadding),
 
-            carPromptLabel.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 20),
-            carPromptLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            carPromptLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            carPromptLabel.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: Paddings.settingsPadding),
+            carPromptLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.settingsPadding),
+            carPromptLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Paddings.settingsPadding),
 
-            carSegmentedControl.topAnchor.constraint(equalTo: carPromptLabel.bottomAnchor, constant: 20),
-            carSegmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            carSegmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            carSegmentedControl.topAnchor.constraint(equalTo: carPromptLabel.bottomAnchor, constant: Paddings.settingsPadding),
+            carSegmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.settingsPadding),
+            carSegmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Paddings.settingsPadding),
 
-            carImageView.topAnchor.constraint(equalTo: carSegmentedControl.bottomAnchor, constant: 20),
+            carImageView.topAnchor.constraint(equalTo: carSegmentedControl.bottomAnchor, constant: Paddings.settingsPadding),
             carImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            carImageView.widthAnchor.constraint(equalToConstant: 100),
-            carImageView.heightAnchor.constraint(equalToConstant: 100),
+            carImageView.widthAnchor.constraint(equalToConstant: ImageFrame.size),
+            carImageView.heightAnchor.constraint(equalToConstant: ImageFrame.size),
 
-            difficultyPromptLabel.topAnchor.constraint(equalTo: carImageView.bottomAnchor, constant: 20),
-            difficultyPromptLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            difficultyPromptLabel.topAnchor.constraint(equalTo: carImageView.bottomAnchor, constant: Paddings.settingsPadding),
+            difficultyPromptLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.settingsPadding),
 
-            difficultySegmentedControl.topAnchor.constraint(equalTo: difficultyPromptLabel.bottomAnchor, constant: 20),
-            difficultySegmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            difficultySegmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+            difficultySegmentedControl.topAnchor.constraint(equalTo: difficultyPromptLabel.bottomAnchor, constant: Paddings.settingsPadding),
+            difficultySegmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.settingsPadding),
+            difficultySegmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Paddings.settingsPadding)
         ])
-
-
     }
 
 

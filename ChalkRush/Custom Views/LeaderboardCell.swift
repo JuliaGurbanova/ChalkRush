@@ -34,8 +34,8 @@ class LeaderboardCell: UITableViewCell {
 
         avatarImageView.contentMode = .scaleAspectFill
         avatarImageView.clipsToBounds = true
-        avatarImageView.layer.cornerRadius = 10
-        avatarImageView.layer.borderWidth = 2.0
+        avatarImageView.layer.cornerRadius = ImageFrame.cornerRadius
+        avatarImageView.layer.borderWidth = ImageFrame.borderWidth
         avatarImageView.layer.borderColor = UIColor.white.cgColor
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -43,19 +43,19 @@ class LeaderboardCell: UITableViewCell {
         scoreLabel.font = UIFont(name: Fonts.chalkduster.rawValue, size: FontSizes.scoreLabel.rawValue)
 
         NSLayoutConstraint.activate([
-            avatarImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            avatarImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Paddings.standard),
             avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            avatarImageView.widthAnchor.constraint(equalToConstant: 50),
-            avatarImageView.heightAnchor.constraint(equalToConstant: 50),
+            avatarImageView.widthAnchor.constraint(equalToConstant: ImageFrame.cellSize),
+            avatarImageView.heightAnchor.constraint(equalToConstant: ImageFrame.cellSize),
 
-            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            nameLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: 8),
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Paddings.standard),
+            nameLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: Paddings.small),
 
-            dateLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4),
-            dateLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: 8),
+            dateLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: Paddings.xSmall),
+            dateLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: Paddings.small),
 
             scoreLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            scoreLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
+                                               scoreLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Paddings.standard)
         ])
     }
 
@@ -68,7 +68,8 @@ class LeaderboardCell: UITableViewCell {
 
     private func formatDate(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d, yyyy HH:mm"
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .short
         return dateFormatter.string(from: date)
     }
 

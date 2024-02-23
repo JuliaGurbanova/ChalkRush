@@ -51,17 +51,16 @@ class LeaderboardViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView()
+        headerView.backgroundColor = .background
         let label = UILabel.createLabel(text: "Score")
 
         headerView.addSubview(label)
 
         NSLayoutConstraint.activate([
-            label.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -16),
+            label.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -Paddings.standard),
             label.centerYAnchor.constraint(equalTo: headerView.centerYAnchor)
         ])
-
-        headerView.backgroundColor = .background
-
+        
         return headerView
     }
 
@@ -72,6 +71,5 @@ class LeaderboardViewController: UITableViewController {
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
-
 }
 

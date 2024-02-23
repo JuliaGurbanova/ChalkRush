@@ -8,41 +8,27 @@
 import UIKit
 import AVFoundation
 
-class GameViewController: UIViewController, AVAudioPlayerDelegate {
-
-    let player = DataManager.load()
+class GameViewController: UIViewController {
+    private let player = DataManager.load()
+    private var isGameRunning = false
+    private var isCollisionDetected = false
 
     var score = 0 {
         didSet {
             scoreLabel.text = "Score: \(score)"
         }
     }
+    private var scoreLabel = UILabel.createLabel(text: "Score: 0")
+
 
     private var countdownLabel = UILabel.createLabel(text: "")
-    private var scoreLabel = UILabel.createLabel(text: "Score: 0")
     private var isCountdownFinished = false
-    private var isCollisionDetected = false
 
-    private var isSoundEnabled = true
-    private var audioPlayer: AVAudioPlayer?
-    private var currentSound: String?
-
-    private var activeObstacleTimers: [Timer] = []
-
-    private let carImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.isUserInteractionEnabled = true
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.layer.borderWidth = 2.0
-        imageView.layer.borderColor = UIColor.blue.cgColor
-        return imageView
-    }()
-
+    private var carImageView = UIImageView()
     private let roadMarkingsView1 = UIImageView(image: UIImage(resource: .roadMarkings))
     private let roadMarkingsView2 = UIImageView(image: UIImage(resource: .roadMarkings))
 
-    private var roadMarkingsAnimationTimer: Timer?
+    private var activeObstacleTimers: [Timer] = []
     private var obstacleGeneratorTimer: Timer?
     private var obstacleGenerationInterval: TimeInterval {
         let difficultyLevel = DifficultyLevel(rawValue: player.gameSettings.difficultyLevelIndex) ?? .medium
@@ -74,20 +60,25 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
         obstacleGenerationInterval / 2
     }
 
-    private var isGameRunning = false
+    private var isSoundEnabled = true
+    private var audioPlayer: AVAudioPlayer?
+    private var currentSound: String?
 
-    // MARK: - viewDidLoad
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .background
-        let soundButton = UIBarButtonItem(image: UIImage(systemName: "speaker"), style: .plain, target: self, action: #selector(toggleSound))
+
+        let soundButton = UIBarButtonItem(image: UIImage(systemName: isSoundEnabled ? "speaker" : "speaker.slash"), style: .plain, target: self, action: #selector(toggleSound))
         navigationItem.rightBarButtonItem = soundButton
+
         setupUI()
         startCountdownAnimation()
-
     }
 
     // MARK: - UI Setup
+
+    /// Starts countdown animation from 3 at the beginning, then runs the game
     private func startCountdownAnimation() {
         var countdown = CountdownSetup.startingNumber
         countdownLabel.text = "\(countdown)"
@@ -95,10 +86,10 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
         countdownLabel.transform = CGAffineTransform(scaleX: CountdownSetup.labelScale, y: CountdownSetup.labelScale)
 
         if isSoundEnabled {
-            setupAudioPlayer(track: "countdown")
+            setupAudioPlayer(track: "countdown", volume: 0.3)
             playSound()
         }
-        
+
         UIView.animate(withDuration: CountdownSetup.duration, animations: {
             self.countdownLabel.transform = .identity
         }) { _ in
@@ -129,8 +120,16 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
 
     private func setupUI() {
         countdownLabel.font = UIFont(name: Fonts.chalkduster.rawValue, size: FontSizes.countdown.rawValue)
+
         scoreLabel.font = UIFont(name: Fonts.chalkduster.rawValue, size: FontSizes.scoreLabel.rawValue)
+
         carImageView.image = UIImage(named: "car\(player.gameSettings.selectedCarIndex + 1)")
+        carImageView.contentMode = .scaleAspectFill
+        carImageView.isUserInteractionEnabled = true
+        carImageView.frame = CGRect(x: view.bounds.midX - CarSize.carWidth / 2,
+                                    y: view.bounds.height - CarSize.carHeight - Paddings.standard,
+                                    width: CarSize.carWidth,
+                                    height: CarSize.carHeight)
 
         view.addSubviews(countdownLabel, scoreLabel, carImageView)
 
@@ -138,28 +137,12 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
             countdownLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             countdownLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
 
-            scoreLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
-            scoreLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-
-            carImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            carImageView.widthAnchor.constraint(equalToConstant: CarSize.carWidth),
-            carImageView.heightAnchor.constraint(equalToConstant: CarSize.carHeight),
-            carImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16)
+            scoreLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Paddings.zero),
+            scoreLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Paddings.standard)
         ])
 
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture))
         carImageView.addGestureRecognizer(panGesture)
-    }
-
-    // MARK: - Game Loop
-    private func startGame() {
-        isGameRunning = true
-        if isSoundEnabled {
-            setupAudioPlayer(track: "driving")
-            playSound()
-        }
-        startObstacleGenerator()
-        animateRoadMarkings()
     }
 
     private func animateRoadMarkings() {
@@ -177,6 +160,17 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
         }, completion: nil)
     }
 
+    // MARK: - Game Setup
+    private func startGame() {
+        isGameRunning = true
+        if isSoundEnabled {
+            setupAudioPlayer(track: "driving")
+            playSound()
+        }
+        startObstacleGenerator()
+        animateRoadMarkings()
+    }
+
     private func endGame() {
         stopSound()
         if score > 0 {
@@ -187,6 +181,24 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
         isGameRunning = false
 
         showGameOverAlert()
+    }
+
+    private func resetGame() {
+        score = 0
+        isCountdownFinished = false
+        isCollisionDetected = false
+
+        for obstacleView in view.subviews where obstacleView is UIImageView && obstacleView != carImageView {
+            obstacleView.removeFromSuperview()
+        }
+        stopActiveObstacleTimers()
+
+        // Reset UI
+        carImageView.center.x = view.bounds.midX - CarSize.carWidth / 2
+        setupUI()
+        scoreLabel.text = "Score: 0"
+
+        startCountdownAnimation()
     }
 
     private func stopRoadMarkingsAnimation() {
@@ -201,13 +213,15 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
         activeObstacleTimers.removeAll()
     }
 
+    // MARK: - Game Actions
+
     private func startObstacleGenerator() {
         obstacleGeneratorTimer = Timer.scheduledTimer(timeInterval: obstacleGenerationInterval, target: self, selector: #selector(generateObstacle), userInfo: nil, repeats: true)
         activeObstacleTimers.append(obstacleGeneratorTimer!)
     }
 
-    // MARK: - Game Actions
-
+    /// Generates obstacles at random X places above the screen, moves them down across the screen, then removes when they are no longer visible.
+    /// Checks for collision when an obstacle reaches the player's car.
     @objc private func generateObstacle() {
         guard isCountdownFinished else {
             return
@@ -221,6 +235,7 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
             obstacleImageView.frame.size = CGSize(width: ObstacleSizes.coneWidth.rawValue, height: ObstacleSizes.coneHeight.rawValue)
         } else if randomObstacle == Obstacles.tyre.rawValue {
             obstacleImageView.frame.size = CGSize(width: ObstacleSizes.tyre.rawValue, height: ObstacleSizes.tyre.rawValue)
+
         } else {
             obstacleImageView.frame.size = CGSize(width: ObstacleSizes.npcCarWidth.rawValue, height: ObstacleSizes.npcCarHeight.rawValue)
         }
@@ -233,7 +248,7 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
 
         view.addSubview(obstacleImageView)
 
-        // update the obstacle position
+        // Update the obstacle position
         let obstacleTimer = Timer.scheduledTimer(withTimeInterval: obstacleSpeed, repeats: true) { [weak self, weak obstacleImageView] timer in
 
             guard let self = self, let obstacleImageView = obstacleImageView else {
@@ -243,13 +258,14 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
 
             obstacleImageView.frame.origin.y += 10
 
+            // Check for collision
             if obstacleImageView.frame.origin.y + obstacleImageView.frame.size.height >= self.carImageView.frame.origin.y {
                 self.checkCollision()
                 if self.isCollisionDetected {
                     timer.invalidate()
                     if isSoundEnabled {
                         DispatchQueue.main.async {
-                            self.setupAudioPlayer(track: "crash")
+                            self.setupAudioPlayer(track: "crash", volume: 0.5)
                             self.playSound()
                         }
                     }
@@ -272,19 +288,15 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
     private func checkCollision() {
         let playerFrame = carImageView.frame
 
-        // Iterate through all obstacle views on the screen
         for obstacleView in view.subviews where obstacleView is UIImageView {
             if let obstacleImageView = obstacleView as? UIImageView,
                let obstacleImageName = obstacleImageView.image?.accessibilityIdentifier,
                obstacleTypes.contains(obstacleImageName) {
                 let obstacleFrame = obstacleImageView.frame
 
-                // Check for intersection between player's car and the obstacle when it reaches the bottom
-                if obstacleFrame.origin.y + obstacleFrame.size.height >= playerFrame.origin.y {
-                    if playerFrame.intersects(obstacleFrame) {
+                if playerFrame.intersects(obstacleFrame) {
                         isCollisionDetected = true
                     }
-                }
             }
         }
     }
@@ -305,26 +317,7 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
         present(alert, animated: true)
     }
 
-    private func resetGame() {
-        score = 0
-        isCountdownFinished = false
-        isCollisionDetected = false
-
-        for obstacleView in view.subviews where obstacleView is UIImageView && obstacleView != carImageView {
-            obstacleView.removeFromSuperview()
-        }
-        stopActiveObstacleTimers()
-
-        // Reset UI
-        setupUI()
-        scoreLabel.text = "Score: 0"
-
-        // Restart countdown
-        startCountdownAnimation()
-    }
-
     private func saveScore() {
-        // Save the score using your data manager or score manager
         let gameScore = Score(player: player, score: score, date: Date())
         ScoreDataManager.saveScore(gameScore)
     }
@@ -345,18 +338,20 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
             let maxX = view.bounds.width - halfCarWidth
 
             carImageView.center.x = min(maxX, max(minX, newX))
-
             sender.setTranslation(.zero, in: view)
         }
     }
+}
 
-    // MARK: - Audio effects
-    private func setupAudioPlayer(track: String) {
+// MARK: - Audio effects
+extension GameViewController: AVAudioPlayerDelegate {
+    private func setupAudioPlayer(track: String, volume: Float = 1.0) {
         if let soundURL = Bundle.main.url(forResource: track, withExtension: "mp3") {
             do {
                 audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
                 audioPlayer?.delegate = self
                 audioPlayer?.prepareToPlay()
+                audioPlayer?.volume = volume
                 currentSound = track
             } catch {
                 print("Error loading sound file: \(error.localizedDescription)")
@@ -392,7 +387,9 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
         }
 
         if currentSound == "crash" {
-            endGame()
+            DispatchQueue.main.async { [weak self] in
+                self?.endGame()
+            }
         } else if currentSound == "driving" {
             audioPlayer?.currentTime = 0
             audioPlayer?.play()
@@ -400,5 +397,4 @@ class GameViewController: UIViewController, AVAudioPlayerDelegate {
 
         self.currentSound = nil
     }
-
 }
