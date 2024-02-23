@@ -172,13 +172,17 @@ class GameViewController: UIViewController {
     }
 
     private func endGame() {
-        stopSound()
-        if score > 0 {
-            saveScore()
+        if isSoundEnabled {
+            self.setupAudioPlayer(track: "crash", volume: 0.5)
+            self.playSound()
         }
         stopRoadMarkingsAnimation()
         stopActiveObstacleTimers()
         isGameRunning = false
+
+        if score > 0 {
+            saveScore()
+        }
 
         showGameOverAlert()
     }
@@ -263,12 +267,6 @@ class GameViewController: UIViewController {
                 self.checkCollision()
                 if self.isCollisionDetected {
                     timer.invalidate()
-                    if isSoundEnabled {
-                        DispatchQueue.main.async {
-                            self.setupAudioPlayer(track: "crash", volume: 0.5)
-                            self.playSound()
-                        }
-                    }
                     self.endGame()
                 }
             }
@@ -387,9 +385,9 @@ extension GameViewController: AVAudioPlayerDelegate {
         }
 
         if currentSound == "crash" {
-            DispatchQueue.main.async { [weak self] in
-                self?.endGame()
-            }
+//            DispatchQueue.main.async { [weak self] in
+//                self?.endGame()
+//            }
         } else if currentSound == "driving" {
             audioPlayer?.currentTime = 0
             audioPlayer?.play()

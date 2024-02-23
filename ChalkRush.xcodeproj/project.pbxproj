@@ -412,6 +412,8 @@
 				DEVELOPMENT_TEAM = M6RSUA6A9T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChalkRush/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Take a photo to use as an avatar.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Use your photo as an avatar.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -443,6 +445,8 @@
 				DEVELOPMENT_TEAM = M6RSUA6A9T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChalkRush/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Take a photo to use as an avatar.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Use your photo as an avatar.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;

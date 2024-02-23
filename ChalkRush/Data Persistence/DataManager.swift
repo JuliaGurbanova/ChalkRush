@@ -19,7 +19,7 @@ struct DataManager {
         } catch {
             print("Error saving player data: \(error.localizedDescription)")
         }
-        print(documentsDirectory)
+//        print(documentsDirectory)
     }
 
     static func load() -> Player {
