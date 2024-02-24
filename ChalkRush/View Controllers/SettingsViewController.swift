@@ -47,7 +47,7 @@ class SettingsViewController: UIViewController, UINavigationControllerDelegate {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        if hasDataChanged {
+        if hasDataChanged || hasAvatarChanged {
             saveUserData()
         }
     }
